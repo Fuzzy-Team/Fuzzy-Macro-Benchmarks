@@ -1,0 +1,37 @@
+diff --git a/src/main.py b/src/main.py
+index 22ad4e70..29af7e31 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -603,8 +603,8 @@ def macro(status, logQueue, updateGUI, run, skipTask):
+ 
+                     #place planter
+                     planterToPlace = getBestPlanter(nextField)
+-					if planterToPlace is None:
+-							break
++                    if planterToPlace is None:
++                        break
+                     if runTask(macro.placePlanter, args=(planterToPlace["name"], nextField, False), convertAfter=False):
+                         savePlacedPlanter(j, nextField, planterToPlace, nectar)
+                         plantersPlaced += 1
+@@ -634,8 +634,8 @@ def macro(status, logQueue, updateGUI, run, skipTask):
+ 
+                         #place planter
+                         planterToPlace = getBestPlanter(nextField)
+-						if planterToPlace is None:
+-							break
++                        if planterToPlace is None:
++                            break
+                         if runTask(macro.placePlanter, args=(planterToPlace["name"], nextField, False), convertAfter=False):
+                             savePlacedPlanter(j, nextField, planterToPlace, nectar)
+                             plantersPlaced += 1
+@@ -658,8 +658,8 @@ def macro(status, logQueue, updateGUI, run, skipTask):
+ 
+                         #place planter
+                         planterToPlace = getBestPlanter(nextField)
+-						if planterToPlace is None:
+-							break
++                        if planterToPlace is None:
++                            break
+                         if runTask(macro.placePlanter, args=(planterToPlace["name"], nextField, False), convertAfter=False):
+                             savePlacedPlanter(j, nextField, planterToPlace, nectar)
+                             plantersPlaced += 1
