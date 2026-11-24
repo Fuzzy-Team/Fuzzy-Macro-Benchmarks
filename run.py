@@ -17,8 +17,8 @@ BUILDS = {
     # The last Existance commit doesn't compile (mixed tabs in main.py); the patch only re-indents those lines.
     "Existance last": ("25c9d35d", "patches/existance-last-tab-fix.patch"),
     "1.3.4": ("1.3.4", None),
-    # 1.4.0c plus the fix that keeps the macro out of the main window process.
-    "1.4.0": ("5668ba78", None),
+    # 1.4.0c plus the fixes that keep the macro out of the main window process and speed up settings.
+    "1.4.0": ("a3568593", None),
 }
 
 TESTS = ["spawn_child", "gui_process", "night_sky", "night_grass", "blue_text_ocr",
