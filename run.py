@@ -22,7 +22,8 @@ BUILDS = {
 }
 
 TESTS = ["spawn_child", "gui_process", "night_sky", "night_grass", "blue_text_ocr",
-         "blue_pass_2", "blue_pass_3", "respawn_wait"]
+         "blue_pass_2", "blue_pass_3", "respawn_wait", "macro_process", "bot_process",
+         "bot_screenshot_block", "settings_load"]
 RUNS = 3
 
 

@@ -1,8 +1,8 @@
 {
  "1.0.0a": {
   "spawn_child": {
-   "seconds": 1.092090292,
-   "rss_mb": 153.265625,
+   "seconds": 0.702329708,
+   "rss_mb": 153.921875,
    "modules": 814,
    "heavy": [
     "Quartz",
@@ -14,8 +14,8 @@
    ]
   },
   "gui_process": {
-   "seconds": 0.753967834,
-   "rss_mb": 153.03125,
+   "seconds": 0.75455875,
+   "rss_mb": 152.578125,
    "heavy": [
     "Quartz",
     "Vision",
@@ -26,30 +26,46 @@
    ]
   },
   "night_sky": {
-   "ms": 196.71720625
+   "ms": 188.8329229
   },
   "night_grass": {
-   "ms": 27.619943749999997
+   "ms": 25.540802100000004
   },
   "blue_text_ocr": {
    "ocr_calls": 0
   },
   "blue_pass_2": {
-   "ms": 41.625652800000005,
+   "ms": 45.93807636666667,
    "captures_per_pass": 2.0
   },
   "blue_pass_3": {
-   "ms": 65.80214583333334,
+   "ms": 68.65825553333332,
    "captures_per_pass": 3.0
   },
   "respawn_wait": {
    "error": "modules.screen.imageSearch.TemplateTooLargeError: Template size (226, 38) is larger than image size (150, 60)"
+  },
+  "macro_process": {
+   "seconds": 0.6627195,
+   "rss_mb": 152.5
+  },
+  "bot_process": {
+   "seconds": 0.777829916,
+   "rss_mb": 166.375
+  },
+  "bot_screenshot_block": {
+   "blocked_ms": 275.894583,
+   "command_ms": 56.1646168
+  },
+  "settings_load": {
+   "load_ms": 1.15682582,
+   "save_ms": 0.5299395499999998
   }
  },
  "Existance last": {
   "spawn_child": {
-   "seconds": 0.811564375,
-   "rss_mb": 150.25,
+   "seconds": 0.853120958,
+   "rss_mb": 150.296875,
    "modules": 813,
    "heavy": [
     "Quartz",
@@ -61,8 +77,8 @@
    ]
   },
   "gui_process": {
-   "seconds": 0.765110167,
-   "rss_mb": 150.109375,
+   "seconds": 0.912774709,
+   "rss_mb": 144.328125,
    "heavy": [
     "Quartz",
     "Vision",
@@ -73,30 +89,46 @@
    ]
   },
   "night_sky": {
-   "ms": 193.94738124999998
+   "ms": 186.30485624999997
   },
   "night_grass": {
-   "ms": 24.90626665
+   "ms": 26.539031249999994
   },
   "blue_text_ocr": {
    "ocr_calls": 0
   },
   "blue_pass_2": {
-   "ms": 46.28044723333333,
+   "ms": 46.04333193333333,
    "captures_per_pass": 2.0
   },
   "blue_pass_3": {
-   "ms": 65.88667776666666,
+   "ms": 70.36800833333334,
    "captures_per_pass": 3.0
   },
   "respawn_wait": {
    "error": "modules.screen.imageSearch.TemplateTooLargeError: Template size (226, 38) is larger than image size (150, 60)"
+  },
+  "macro_process": {
+   "seconds": 0.7212119589999999,
+   "rss_mb": 150.484375
+  },
+  "bot_process": {
+   "seconds": 0.782514083,
+   "rss_mb": 165.671875
+  },
+  "bot_screenshot_block": {
+   "blocked_ms": 287.699375,
+   "command_ms": 57.5243084
+  },
+  "settings_load": {
+   "load_ms": 0.6077825,
+   "save_ms": 0.5967708499999997
   }
  },
  "1.3.4": {
   "spawn_child": {
-   "seconds": 0.728191542,
-   "rss_mb": 159.34375,
+   "seconds": 0.701347042,
+   "rss_mb": 156.96875,
    "modules": 612,
    "heavy": [
     "Quartz",
@@ -108,8 +140,8 @@
    ]
   },
   "gui_process": {
-   "seconds": 0.736423166,
-   "rss_mb": 153.984375,
+   "seconds": 0.680770792,
+   "rss_mb": 158.1875,
    "heavy": [
     "Quartz",
     "Vision",
@@ -120,38 +152,54 @@
    ]
   },
   "night_sky": {
-   "ms": 188.53719585000002
+   "ms": 188.11481040000004
   },
   "night_grass": {
-   "ms": 24.858966650000003
+   "ms": 27.802456249999995
   },
   "blue_text_ocr": {
    "ocr_calls": 4
   },
   "blue_pass_2": {
-   "ms": 66.52482083333334,
+   "ms": 67.04424583333333,
    "captures_per_pass": 2.0
   },
   "blue_pass_3": {
-   "ms": 98.61862083333334,
+   "ms": 98.80002916666666,
    "captures_per_pass": 3.0
   },
   "respawn_wait": {
-   "cpu_percent": 5.1735438495939885,
-   "captures": 190,
+   "cpu_percent": 4.826444607959274,
+   "captures": 184,
    "sleeps": false
+  },
+  "macro_process": {
+   "seconds": 0.7489222910000001,
+   "rss_mb": 165.828125
+  },
+  "bot_process": {
+   "seconds": 0.801697417,
+   "rss_mb": 174.84375
+  },
+  "bot_screenshot_block": {
+   "blocked_ms": 516.516167,
+   "command_ms": 103.2500668
+  },
+  "settings_load": {
+   "load_ms": 7.042962500000001,
+   "save_ms": 0.5858228999999993
   }
  },
  "1.4.0": {
   "spawn_child": {
-   "seconds": 0.0002941659999999985,
-   "rss_mb": 27.53125,
+   "seconds": 0.00028337499999999544,
+   "rss_mb": 27.125,
    "modules": 1,
    "heavy": []
   },
   "gui_process": {
-   "seconds": 0.398514375,
-   "rss_mb": 113.296875,
+   "seconds": 0.336612791,
+   "rss_mb": 112.625,
    "heavy": [
     "Quartz",
     "cv2",
@@ -160,26 +208,42 @@
    ]
   },
   "night_sky": {
-   "ms": 1.786370850000002
+   "ms": 1.4496083499999979
   },
   "night_grass": {
-   "ms": 26.284758300000007
+   "ms": 24.47510205
   },
   "blue_text_ocr": {
    "ocr_calls": 1
   },
   "blue_pass_2": {
-   "ms": 50.01669583333334,
+   "ms": 52.54714166666667,
    "captures_per_pass": 1.0
   },
   "blue_pass_3": {
-   "ms": 66.11845139999998,
+   "ms": 67.48031946666666,
    "captures_per_pass": 1.0
   },
   "respawn_wait": {
-   "cpu_percent": 2.018149225920594,
-   "captures": 40,
+   "cpu_percent": 2.137412691670827,
+   "captures": 38,
    "sleeps": true
+  },
+  "macro_process": {
+   "seconds": 0.668115833,
+   "rss_mb": 153.03125
+  },
+  "bot_process": {
+   "seconds": 0.574189541,
+   "rss_mb": 159.375
+  },
+  "bot_screenshot_block": {
+   "blocked_ms": 106.43108299999993,
+   "command_ms": 134.7304418
+  },
+  "settings_load": {
+   "load_ms": 6.0754175,
+   "save_ms": 6.274522899999998
   }
  }
 }

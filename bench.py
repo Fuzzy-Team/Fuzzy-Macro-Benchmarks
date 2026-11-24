@@ -29,6 +29,19 @@ def stub_model_download():
     mm.ensure_missing_supported_models = lambda: None
 
 
+def sync_default_settings():
+    # The main window fills missing settings from the defaults before Start. Builds that keep
+    # settings in ../settings only do it in main.py's __main__ block, so repeat that step here.
+    import modules.misc.settingsManager as sm
+    if not os.path.exists("../settings/generalsettings.txt") or hasattr(sm, "getDefaultSettingsPath"):
+        return
+    sm.saveDict("../settings/profiles/a/settings.txt",
+                {**sm.readSettingsFile("./data/default_settings/settings.txt"), **sm.loadSettings()})
+    sm.saveDict("../settings/generalsettings.txt",
+                {**sm.readSettingsFile("./data/default_settings/generalsettings.txt"),
+                 **sm.readSettingsFile("../settings/generalsettings.txt")})
+
+
 def macro_class():
     try:
         from modules.macro.events import EventDetectionMixin as cls
@@ -185,3 +198,84 @@ elif test in ("blue_pass_2", "blue_pass_3", "respawn_wait"):
         for _ in range(runs):
             one_pass()
         emit(ms=(time.perf_counter() - t) / runs * 1000, captures_per_pass=captures["n"] / runs)
+
+elif test == "macro_process":
+    # The macro child after Start: main.py's top level (spawn), then build the macro object.
+    import queue
+    stub_model_download()
+    sync_default_settings()
+    t = time.perf_counter()
+    runpy.run_path(os.path.join(src, "main.py"), run_name="__mp_main__")
+    import modules.macro as macroModule
+    value = lambda v: types.SimpleNamespace(value=v)
+    macroModule.macro(value(""), queue.Queue(), value(False), value(0), value(0))
+    emit(seconds=time.perf_counter() - t, rss_mb=rss_mb())
+
+elif test == "bot_process":
+    # The Discord bot child: main.py's top level (spawn), then the bot module. The bot isn't started.
+    stub_model_download()
+    t = time.perf_counter()
+    runpy.run_path(os.path.join(src, "main.py"), run_name="__mp_main__")
+    import modules.discord_bot.discordBot  # noqa: F401
+    emit(seconds=time.perf_counter() - t, rss_mb=rss_mb())
+
+elif test == "bot_screenshot_block":
+    # Run each build's own /screenshot handler and measure the longest time the bot's event loop
+    # was stuck. While it's stuck the bot can't answer any other command.
+    import ast
+    import asyncio
+    import modules.discord_bot.discordBot as bot
+    path = bot.__file__
+    tree = ast.parse(open(path).read())
+    handler = next(n for n in ast.walk(tree) if isinstance(n, ast.AsyncFunctionDef) and n.name == "screenshot")
+    handler.decorator_list = []
+    module = ast.Module(body=[handler], type_ignores=[])
+    namespace = dict(vars(bot))
+    exec(compile(module, path, "exec"), namespace)
+    screenshot = namespace["screenshot"]
+
+    async def noop(*a, **k):
+        return None
+    interaction = types.SimpleNamespace(
+        response=types.SimpleNamespace(defer=noop, send_message=noop, is_done=lambda: True),
+        followup=types.SimpleNamespace(send=noop), user=types.SimpleNamespace(id=0))
+
+    async def main():
+        await screenshot(interaction)  # warm up so first-call imports don't count
+        gaps = []
+        done = False
+
+        async def heartbeat():
+            last = time.perf_counter()
+            while not done:
+                await asyncio.sleep(0.005)
+                now = time.perf_counter()
+                gaps.append(now - last - 0.005)
+                last = now
+        hb = asyncio.ensure_future(heartbeat())
+        await asyncio.sleep(0.05)
+        t = time.perf_counter()
+        for _ in range(5):
+            await screenshot(interaction)
+        took = (time.perf_counter() - t) / 5
+        done = True
+        await hb
+        return max(gaps), took
+    worst, took = asyncio.get_event_loop().run_until_complete(main())
+    emit(blocked_ms=worst * 1000, command_ms=took * 1000)
+
+elif test == "settings_load":
+    import modules.misc.settingsManager as settingsManager
+    sync_default_settings()
+    settingsManager.loadAllSettings()
+    runs = 50
+    t = time.perf_counter()
+    for _ in range(runs):
+        settingsManager.loadAllSettings()
+    load = (time.perf_counter() - t) / runs
+    # Saves write into this build's own checkout, never the installed macro's settings.
+    runs = 20
+    t = time.perf_counter()
+    for i in range(runs):
+        settingsManager.saveProfileSetting("movespeed", 28 + i % 2)
+    emit(load_ms=load * 1000, save_ms=(time.perf_counter() - t) / runs * 1000)

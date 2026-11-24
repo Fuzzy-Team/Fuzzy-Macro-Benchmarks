@@ -15,22 +15,33 @@ Apple M4, macOS, Python 3.9.8. Each number is the median of 3 runs.
 
 | Test | 1.0.0a | Existance last | 1.3.4 | 1.4.0 |
 |---|---|---|---|---|
-| Main window process memory | 153 MB | 150 MB | 154 MB | **113 MB** |
-| Main window process load time | 0.75 s | 0.77 s | 0.74 s | **0.40 s** |
-| Helper process memory (Manager, Discord bot) | 153 MB | 150 MB | 159 MB | **28 MB** |
-| Night check while converting | 197 ms | 194 ms | 189 ms | **1.8 ms** |
-| Night check while gathering | 28 ms | 25 ms | 25 ms | 26 ms |
+| Total app memory (all four processes) | 625 MB | 611 MB | 656 MB | **452 MB** |
+| Main window process memory | 153 MB | 144 MB | 158 MB | **113 MB** |
+| Main window process load time | 0.75 s | 0.91 s | 0.68 s | **0.34 s** |
+| Helper process memory (Manager) | 154 MB | 150 MB | 157 MB | **27 MB** |
+| Macro process startup time | 0.66 s | 0.72 s | 0.75 s | 0.67 s |
+| Macro process memory | 153 MB | 150 MB | 166 MB | 153 MB |
+| Discord bot process memory | 166 MB | 166 MB | 175 MB | 159 MB |
+| Discord bot stall during /screenshot | 276 ms | 288 ms | 517 ms | **106 ms** |
+| Night check while converting | 189 ms | 186 ms | 188 ms | **1.4 ms** |
+| Night check while gathering | 26 ms | 27 ms | 28 ms | 24 ms |
 | Blue-text OCR reads per background tick | n/a | n/a | 4 | **1** |
-| Fight check pass, 2 messages | 42 ms | 46 ms | 67 ms | 50 ms |
-| Fight check pass, 3 messages (Mondo) | 66 ms | 66 ms | 99 ms | 66 ms |
-| Screenshots in the 3 s respawn wait | crashes | crashes | 190 | **40** |
+| Fight check pass, 2 messages | 46 ms | 46 ms | 67 ms | 53 ms |
+| Fight check pass, 3 messages (Mondo) | 69 ms | 70 ms | 99 ms | 67 ms |
+| Screenshots in the 3 s respawn wait | crashes | crashes | 184 | **38** |
+| Settings load time | 1.2 ms | 0.6 ms | 7.0 ms | 6.1 ms |
+| Settings save time | 0.5 ms | 0.6 ms | 0.6 ms | 6.3 ms |
 | Settings app size on disk | 10.2 MB | 1.0 MB | 11.0 MB | 2.6 MB |
 
 The settings app size comes from `du` on `src/webapp`, not from `run.py`.
 
 What the numbers mean:
 
-- **Helper processes** are the children started with `spawn`, which re-runs `main.py`'s top level. Before 1.4.0 that loaded the whole macro (OCR, Vision, cv2, pyautogui) into every child.
+- **Helper process** is the Manager child, started with `spawn`, which re-runs `main.py`'s top level. Before 1.4.0 that loaded the whole macro (OCR, Vision, cv2, pyautogui) into it.
+- **Total app memory** adds the main window, the Manager, the macro process after Start and the Discord bot process. The bot is imported but not logged in.
+- **Macro process** runs `main.py`'s top level like `spawn` does, then builds the macro object with each build's fresh default settings. Every build loads the full macro here, so time and memory barely change.
+- **Discord bot stall** runs each build's own `/screenshot` handler with a fake Discord interaction and measures the longest gap in a 5 ms heartbeat on the bot's event loop. While the loop is stuck, the bot can't answer other commands. 1.4.0 captures the screen on a worker thread, but still encodes the PNG on the loop, so it doesn't reach zero.
+- **Settings load and save** call `loadAllSettings` and `saveProfileSetting` on each build's own fresh settings. Saving is about 10x slower in 1.4.0 because it goes through the profile system. At 6 ms that isn't noticeable, but it is slower.
 - **Night check while converting** scans the sky for a black 15×15 square. Older builds loop over it in Python. 1.4.0 uses a summed-area table. The test frame is a daytime 1512×945 Retina screen, so every build scans the whole strip.
 - **Blue-text OCR** turns on the guiding star, unusual sprout, windy bee and sticker sprout pings. 1.3.4 reads the text once per detector. 1.4.0 reads it once and shares it. One read takes about 46 ms on this machine. 1.0.0a and Existance last don't have these pings.
 - **Fight check pass** uses real screen captures. 1.4.0 takes one screenshot per pass instead of one per message. It beats 1.3.4 but not the two older builds, because their image search did less work per check.
