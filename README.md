@@ -4,16 +4,16 @@ Performance tests that run the real code from four Fuzzy Macro builds side by si
 
 | Label | Git ref | Notes |
 |---|---|---|
-| 1.0.0a | `1.0.0a` | |
-| Existance last | `25c9d35d` | The last commit by existancepy. Its `main.py` doesn't compile, so `patches/existance-last-tab-fix.patch` re-indents three tab-indented blocks. Nothing else changes. |
-| 1.3.4 | `1.3.4` | |
+| Fuzzy Version 1 (1.0.0a) | `1.0.0a` | |
+| Existance Macro (latest) | `25c9d35d` | The last commit by existancepy. Its `main.py` doesn't compile, so `patches/existance-last-tab-fix.patch` re-indents three tab-indented blocks. Nothing else changes. |
+| Fuzzy Version 1.3.5 | `1.3.4` | |
 | 1.4.0 | `a3568593` | 1.4.0c plus the fixes that keep the macro out of the main window process and speed up settings |
 
 ## Results
 
 Apple M4, macOS, Python 3.9.8. Each number is the median of 3 runs.
 
-| Test | 1.0.0a | Existance last | 1.3.4 | 1.4.0 |
+| Test | Fuzzy Version 1 (1.0.0a) | Existance Macro (latest) | Fuzzy Version 1.3.5 | 1.4.0 |
 |---|---|---|---|---|
 | Total app memory (all four processes) | 625 MB | 615 MB | 660 MB | **456 MB** |
 | Main window process memory | 152 MB | 150 MB | 159 MB | **113 MB** |
@@ -43,10 +43,10 @@ What the numbers mean:
 - **Discord bot stall** runs each build's own `/screenshot` handler with a fake Discord interaction and measures the longest gap in a 5 ms heartbeat on the bot's event loop. While the loop is stuck, the bot can't answer other commands. 1.4.0 captures the screen on a worker thread. It still encodes the PNG on the loop, so the stall isn't zero.
 - **Settings load and save** call `loadAllSettings` and `saveProfileSetting` on each build's own fresh settings. 1.4.0 has about 1,600 settings, 6x more than the oldest builds. It used to parse every line with `ast.literal_eval` on each load, which took about 7 ms. It now parses numbers, True/False/None and plain words directly and reuses the parse of an unchanged file. A save is still a little slower than the old builds because it writes a temporary file, syncs it to disk and swaps it in, so a crash mid-save can't leave a half-written settings file.
 - **Night check while converting** scans the sky for a black 15×15 square. Older builds loop over it in Python. 1.4.0 uses a summed-area table. The test frame is a daytime 1512×945 Retina screen, so every build scans the whole strip.
-- **Blue-text OCR** turns on the guiding star, unusual sprout, windy bee and sticker sprout pings. 1.3.4 reads the text once per detector. 1.4.0 reads it once and shares it. One read takes about 46 ms on this machine. 1.0.0a and Existance last don't have these pings.
-- **Fight check pass** uses real screen captures. 1.4.0 takes one screenshot per pass instead of one per message. It beats 1.3.4 and roughly ties the two older builds. Each search tries the template at 100%, 95% and 105% size so a slightly scaled window still matches. The old builds tried only 100%.
-- **Respawn wait** runs the "wait for the empty health bar" loop after a reset. 1.3.4 has no pause in it. 1.0.0a and Existance last raise `TemplateTooLargeError` on a Retina screen. Their screenshot comes back at half size (150×60), smaller than the 226×38 health bar image.
-- **Settings app size.** Existance last is the smallest because it has no cheat sheet images. 1.0.0a and 1.3.4 ship them as PNGs (about 9 MB). 1.4.0 ships them as WebP (about 1 MB).
+- **Blue-text OCR** turns on the guiding star, unusual sprout, windy bee and sticker sprout pings. Fuzzy Version 1.3.5 reads the text once per detector. 1.4.0 reads it once and shares it. One read takes about 46 ms on this machine. Fuzzy Version 1 (1.0.0a) and Existance Macro (latest) don't have these pings.
+- **Fight check pass** uses real screen captures. 1.4.0 takes one screenshot per pass instead of one per message. It beats Fuzzy Version 1.3.5 and roughly ties the two older builds. Each search tries the template at 100%, 95% and 105% size so a slightly scaled window still matches. The old builds tried only 100%.
+- **Respawn wait** runs the "wait for the empty health bar" loop after a reset. Fuzzy Version 1.3.5 has no pause in it. Fuzzy Version 1 (1.0.0a) and Existance Macro (latest) raise `TemplateTooLargeError` on a Retina screen. Their screenshot comes back at half size (150×60), smaller than the 226×38 health bar image.
+- **Settings app size.** Existance Macro (latest) is the smallest because it has no cheat sheet images. Fuzzy Version 1 (1.0.0a) and Fuzzy Version 1.3.5 ship them as PNGs (about 9 MB). 1.4.0 ships them as WebP (about 1 MB).
 
 ## Running it
 

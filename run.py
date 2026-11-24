@@ -13,10 +13,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # label -> (git ref, patch to apply or None)
 BUILDS = {
-    "1.0.0a": ("1.0.0a", None),
+    "Fuzzy Version 1 (1.0.0a)": ("1.0.0a", None),
     # The last Existance commit doesn't compile (mixed tabs in main.py); the patch only re-indents those lines.
-    "Existance last": ("25c9d35d", "patches/existance-last-tab-fix.patch"),
-    "1.3.4": ("1.3.4", None),
+    "Existance Macro (latest)": ("25c9d35d", "patches/existance-last-tab-fix.patch"),
+    "Fuzzy Version 1.3.5": ("1.3.4", None),
     # 1.4.0c plus the fixes that keep the macro out of the main window process and speed up settings.
     "1.4.0": ("a3568593", None),
 }
