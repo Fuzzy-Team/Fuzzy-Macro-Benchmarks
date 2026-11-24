@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuzzy Macro Benchmarks</title>
+<meta name="description" content="Fuzzy Macro 1.4.0 compared with 1.3.4, 1.0.0a and the last Existance commit.">
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#fafaf9;--fg:#1c1917;--muted:#6b6560;--line:#e7e5e4;--old:#c9c4bf;--new:#2563eb;
+  --font:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#141312;--fg:#f5f5f4;--muted:#a8a29e;--line:#2e2b29;--old:#57524d;--new:#60a5fa}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font)}
+main{max-width:760px;margin:0 auto;padding:48px 16px 64px}
+h1{font-size:28px;line-height:1.2;margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 36px;max-width:60ch}
+.grid{display:grid;gap:32px}
+section h2{font-size:15px;margin:0}
+section p{margin:2px 0 10px;font-size:13px;color:var(--muted)}
+.row{display:grid;grid-template-columns:112px 1fr 84px;gap:12px;align-items:center;height:28px;font-size:13px}
+.row .lab{color:var(--muted);white-space:nowrap}
+.row .bar{height:12px;border-radius:0 4px 4px 0;background:var(--old);min-width:2px}
+.row .val{text-align:right;font-variant-numeric:tabular-nums}
+.row.new .lab,.row.new .val{color:var(--fg);font-weight:600}
+.row.new .bar{background:var(--new)}
+.na{color:var(--muted)}
+details{margin-top:48px;border-top:1px solid var(--line);padding-top:20px}
+summary{cursor:pointer;font-weight:600}
+.table-wrap{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+footer{margin-top:40px;font-size:13px;color:var(--muted)}
+a{color:var(--new)}
+@media (max-width:480px){.row{grid-template-columns:92px 1fr 70px;gap:8px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Fuzzy Macro benchmarks</h1>
+  <p class="lede">The real code from four builds, run side by side on an Apple M4. Each number is the median of 3 runs. 1.4.0 is 1.4.0c plus the fix that keeps the macro out of the main window process.</p>
+  <div class="grid" id="charts"></div>
+
+  <details>
+    <summary>All numbers as a table</summary>
+    <div class="table-wrap"><table id="table"></table></div>
+  </details>
+
+  <footer>
+    Existance last is commit 25c9d35d with its tab-indented lines re-indented so it compiles.
+    Source, method and raw results: <a href="https://github.com/Fuzzy-Team/Fuzzy-Macro-Benchmarks">Fuzzy-Macro-Benchmarks</a>.
+  </footer>
+</main>
+<script>
+const BUILDS = ["1.0.0a", "Existance last", "1.3.4", "1.4.0"];
+// value(result) reads one number from results.json; null means the build can't run the test
+const CHARTS = [
+  {title: "Main window process memory", note: "Settings window process at startup. Lower is better.", unit: " MB", digits: 0,
+   value: r => r.gui_process.rss_mb},
+  {title: "Main window load time", note: "Imports before the window opens. Lower is better.", unit: " s", digits: 2,
+   value: r => r.gui_process.seconds},
+  {title: "Helper process memory", note: "Each Manager and Discord bot child process. Lower is better.", unit: " MB", digits: 0,
+   value: r => r.spawn_child.rss_mb},
+  {title: "Night check while converting", note: "One sky check on a daytime 1512×945 Retina frame.", unit: " ms", digits: 1,
+   value: r => r.night_sky.ms},
+  {title: "Night check while gathering", note: "Grass colour check. Unchanged between builds.", unit: " ms", digits: 0,
+   value: r => r.night_grass.ms},
+  {title: "Blue-text OCR reads per background tick", note: "Star, sprout, windy bee and sticker pings on. One read takes about 46 ms. Older builds don't have these pings.", unit: "", digits: 0,
+   value: r => r.blue_text_ocr.ocr_calls || null},
+  {title: "Mondo fight check pass", note: "Died, defeated and Mondo checks with real screen captures. 1.4.0 takes 1 screenshot instead of 3.", unit: " ms", digits: 0,
+   value: r => r.blue_pass_3.ms},
+  {title: "Screenshots in the respawn wait", note: "Captures during the 3 s empty health bar wait. 1.0.0a and Existance last crash in this loop on a Retina screen.", unit: "", digits: 0,
+   value: r => r.respawn_wait.captures ?? null},
+  {title: "Settings app size on disk", note: "Existance last is smallest because it has no cheat sheet images.", unit: " MB", digits: 1,
+   value: (r, b) => ({"1.0.0a": 10.2, "Existance last": 1.0, "1.3.4": 11.0, "1.4.0": 2.6})[b]},
+];
+
+const fmt = (v, c) => v == null ? "n/a" : v.toFixed(c.digits) + c.unit;
+
+fetch("results.json").then(r => r.json()).then(results => {
+  const charts = document.getElementById("charts");
+  const rows = [];
+  for (const c of CHARTS) {
+    const vals = BUILDS.map(b => c.value(results[b], b));
+    const max = Math.max(...vals.map(v => v || 0));
+    const sec = document.createElement("section");
+    sec.innerHTML = `<h2>${c.title}</h2><p>${c.note}</p>` + vals.map((v, i) => `
+      <div class="row${i === 3 ? " new" : ""}" title="${BUILDS[i]}: ${fmt(v, c)}">
+        <span class="lab">${BUILDS[i]}</span>
+        <div>${v == null ? "" : `<div class="bar" style="width:${v / max * 100}%"></div>`}</div>
+        <span class="val${v == null ? " na" : ""}">${fmt(v, c)}</span>
+      </div>`).join("");
+    charts.append(sec);
+    rows.push(`<tr><td>${c.title}</td>${vals.map(v => `<td>${fmt(v, c)}</td>`).join("")}</tr>`);
+  }
+  document.getElementById("table").innerHTML =
+    `<thead><tr><th>Test</th>${BUILDS.map(b => `<th scope="col">${b}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody>`;
+});
+</script>
+</body>
+</html>
